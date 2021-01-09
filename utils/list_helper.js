@@ -1,7 +1,13 @@
-
-
-const dummy =blogs=>{
+const dummy = blogs => {
     return 1
 }
 
-export {dummy}
+
+const totalLikes = (blogs) => {
+    return blogs.reduce((acc, curr) => acc + curr.likes, 0)
+}
+
+
+
+export {dummy, totalLikes}
+
