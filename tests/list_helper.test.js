@@ -1,13 +1,13 @@
 import listHelper from "../utils/list_helper.js";
 
 
-test('dummy returns one', ()=>{
+test('dummy returns one', () => {
     const blogs = []
     const result = listHelper.dummy(blogs)
     expect(result).toBe(1)
 })
 
-describe("total likes", ()=>{
+describe("total likes", () => {
     const listWithOneBlog = [
         {
             _id: '5a422aa71b54a676234d17f8',
@@ -19,14 +19,14 @@ describe("total likes", ()=>{
         }
     ]
 
-    test('when list has only one blog, equals the likes of that', ()=>{
+    test('when list has only one blog, equals the likes of that', () => {
         const result = listHelper.totalLikes(listWithOneBlog)
         expect(result).toBe(5)
     })
 })
 
 
-describe("favorite blog", ()=>{
+describe("favorite blog", () => {
 
     const listWithMany = [
         {
@@ -60,7 +60,7 @@ describe("favorite blog", ()=>{
         }
     ]
 
-    test('find favorite blog', ()=>{
+    test('find favorite blog', () => {
         const result = listHelper.favoriteBlog(listWithMany)
         expect(result).toEqual({
             title: "Canonical string reduction",
@@ -71,7 +71,7 @@ describe("favorite blog", ()=>{
 
 })
 
-describe('most blogs', ()=>{
+describe('authors', () => {
 
     const listWithMany = [
         {
@@ -106,9 +106,13 @@ describe('most blogs', ()=>{
     ]
 
 
-    test('most blogs', ()=>{
+    test('most blogs', () => {
         const result = listHelper.mostBlogs(listWithMany)
-        expect(result).toEqual({ author: 'Edsger W. Dijkstra', blogs: 3 }
-        )
+        expect(result).toEqual({author: 'Edsger W. Dijkstra', blogs: 3})
+    })
+
+    test('most likes', () => {
+        const result = listHelper.mostLikes(listWithMany)
+        expect(result).toEqual({author: 'Edsger W. Dijkstra', likes: 18})
     })
 })
