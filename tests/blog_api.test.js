@@ -108,9 +108,9 @@ describe('adding new blog posts', () => {
 })
 
 
-describe('deleting blog post', ()=>{
+describe('deleting blog post', () => {
 
-    test('a blog post can be deleted', async ()=>{
+    test('a blog post can be deleted', async () => {
         const postsInDb = await helper.postsInDb()
         const blogPostToDelete = postsInDb[0]
         await api
@@ -120,6 +120,27 @@ describe('deleting blog post', ()=>{
     })
 })
 
+
+describe('updating blog post', () => {
+
+    test('a blog post can be updated', async () => {
+        const postsInDb = await helper.postsInDb()
+        const blogPostToUpadte = postsInDb[0]
+        console.log("blogPostToUpadte", blogPostToUpadte)
+
+        const result = await api.put(`/api/blogs/${blogPostToUpadte.id}`)
+            .send({
+                ...blogPostToUpadte,
+                likes: blogPostToUpadte.likes + 1000
+            })
+
+
+        console.log("result.body", result.body)
+        expect(result.body.likes).toEqual(blogPostToUpadte.likes + 1000)
+
+
+    })
+})
 
 afterAll(() => {
     mongoose.connection.close().catch(e => console.log(e))
