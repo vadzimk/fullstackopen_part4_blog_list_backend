@@ -28,8 +28,13 @@ blogsRouter.get('/',
 
 blogsRouter.post('/',
     async (request, response, next) => {
+    const newBlog = {
+        title: request.body.title,
+        author: request.body.author,
+        likes: request.body.likes || 0
+    }
         try {
-            const blog = new Blog(request.body)
+            const blog = new Blog(newBlog)
             const result = await blog.save()
             response.status(201).json(result)
         } catch (e) {

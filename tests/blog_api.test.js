@@ -39,7 +39,8 @@ describe('blog api', () => {
     test('a new blog post can be added', async () => {
         const newBlogPost = {
             title: "test title",
-            author: "anonymous"
+            author: "anonymous",
+            likes: 1
         }
         await api.post('/api/blogs')
             .send(newBlogPost)
@@ -50,6 +51,25 @@ describe('blog api', () => {
         const contents = response.body.map(item=>item.title)
         expect(response.body).toHaveLength(helper.initial_blogs.length + 1)
         expect(contents).toContain(newBlogPost.title)
+    })
+
+    test('missing likes property in the request defaults to zero', async()=>{
+        const newBlogPost = {
+            title: "missing likes test",
+            author: "anonymous"
+        }
+
+        const response = await api.post('/api/blogs')
+            .send(newBlogPost)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const newBlogId = response.body.id
+
+        const allnotes = await api.get('/api/blogs')
+        const newelyCreatedPost = allnotes.body.find(item=>item.id===newBlogId)
+        console.log(newelyCreatedPost)
+        expect(newelyCreatedPost.likes).toBeDefined()
     })
 })
 
