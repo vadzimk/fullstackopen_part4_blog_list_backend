@@ -28,7 +28,17 @@ describe('blog api', () => {
 
         expect(response.body).toHaveLength(helper.initial_blogs.length)
     })
+
+    test('id property is defined', async()=>{
+        const response =await api.get('/api/blogs')
+        console.log(response.body[0])
+
+        expect(response.body[0].id).toBeDefined()
+    })
 })
+
+
+
 
 afterAll(() => {
     mongoose.connection.close().catch(e => console.log(e))
