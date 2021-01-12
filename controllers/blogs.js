@@ -28,12 +28,24 @@ blogsRouter.get('/',
 
 blogsRouter.post('/',
     async (request, response, next) => {
-    const newBlog = {
-        title: request.body.title,
-        author: request.body.author,
-        likes: request.body.likes || 0
-    }
         try {
+
+            if (request.body.title === undefined) {
+                response.status(400).json({error: "title must be specified"})
+                return
+            }
+
+            if (request.body.url === undefined) {
+                response.status(400).json({error: "url must be specified"})
+                return
+            }
+
+            const newBlog = {
+                title: request.body.title,
+                author: request.body.author,
+                likes: request.body.likes || 0
+            }
+
             const blog = new Blog(newBlog)
             const result = await blog.save()
             response.status(201).json(result)

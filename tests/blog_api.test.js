@@ -40,6 +40,7 @@ describe('blog api', () => {
         const newBlogPost = {
             title: "test title",
             author: "anonymous",
+            url: "http://",
             likes: 1
         }
         await api.post('/api/blogs')
@@ -48,15 +49,16 @@ describe('blog api', () => {
             .expect('Content-Type', /application\/json/)
 
         const response = await api.get('/api/blogs')
-        const contents = response.body.map(item=>item.title)
+        const contents = response.body.map(item => item.title)
         expect(response.body).toHaveLength(helper.initial_blogs.length + 1)
         expect(contents).toContain(newBlogPost.title)
     })
 
-    test('missing likes property in the request defaults to zero', async()=>{
+    test('missing likes property in the request defaults to zero', async () => {
         const newBlogPost = {
             title: "missing likes test",
-            author: "anonymous"
+            author: "anonymous",
+            url: "http://"
         }
 
         const response = await api.post('/api/blogs')
@@ -67,12 +69,42 @@ describe('blog api', () => {
         const newBlogId = response.body.id
 
         const allnotes = await api.get('/api/blogs')
-        const newelyCreatedPost = allnotes.body.find(item=>item.id===newBlogId)
+        const newelyCreatedPost = allnotes.body.find(item => item.id === newBlogId)
         console.log(newelyCreatedPost)
         expect(newelyCreatedPost.likes).toBeDefined()
     })
+
+
 })
 
+
+describe('if title and url missing in req data, res.status==400', ()=>{
+
+    test('if title missing in req data, res.status==400', async () => {
+
+        const noTitleBlogPost = {
+            author: "anonymous",
+            url: "http://"
+        }
+
+        await api.post('/api/blogs')
+            .send(noTitleBlogPost)
+            .expect(400)
+    })
+
+    test('if url missing in req data, res.status==400', async () => {
+
+        const noUrlBlogPost = {
+            title: "missing likes test",
+            author: "anonymous",
+        }
+
+        await api.post('/api/blogs')
+            .send(noUrlBlogPost)
+            .expect(400)
+
+    })
+})
 
 afterAll(() => {
     mongoose.connection.close().catch(e => console.log(e))
