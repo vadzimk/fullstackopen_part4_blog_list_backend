@@ -1,3 +1,5 @@
+import Blog from "../models/blog.js";
+
 const initial_blogs = [
     {
         title: 'Go To Statement Considered Harmful',
@@ -26,8 +28,11 @@ const initial_blogs = [
 ]
 
 
+const postsInDb = async ()=>{
+    const blogs = await Blog.find({})
+    return blogs.map(item=>item.toJSON())
+}
 
 
 
-
-export default {initial_blogs}
+export default {initial_blogs, postsInDb}

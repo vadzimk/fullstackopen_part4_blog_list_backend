@@ -54,4 +54,19 @@ blogsRouter.post('/',
         }
     })
 
+blogsRouter.delete('/:id',
+    async (req, res, next) => {
+        try {
+            const id = req.params.id
+            const result = await Blog.findByIdAndRemove(id)
+            if (!result) {  // if id is not found, result is null
+                res.status(404).end()
+            } else {
+                res.status(204).end()  // no content (resource has been deleted per request)
+            }
+        } catch (e) {
+            next(e)
+        }
+    })
+
 export default blogsRouter

@@ -36,6 +36,9 @@ describe('blog api', () => {
         expect(response.body[0].id).toBeDefined()
     })
 
+})
+
+describe('adding new blog posts', () => {
     test('a new blog post can be added', async () => {
         const newBlogPost = {
             title: "test title",
@@ -74,37 +77,49 @@ describe('blog api', () => {
         expect(newelyCreatedPost.likes).toBeDefined()
     })
 
+    describe('if title and url missing in req data, res.status==400', () => {
+
+        test('if title missing in req data, res.status==400', async () => {
+
+            const noTitleBlogPost = {
+                author: "anonymous",
+                url: "http://"
+            }
+
+            await api.post('/api/blogs')
+                .send(noTitleBlogPost)
+                .expect(400)
+        })
+
+        test('if url missing in req data, res.status==400', async () => {
+
+            const noUrlBlogPost = {
+                title: "missing likes test",
+                author: "anonymous",
+            }
+
+            await api.post('/api/blogs')
+                .send(noUrlBlogPost)
+                .expect(400)
+
+        })
+    })
 
 })
 
 
-describe('if title and url missing in req data, res.status==400', ()=>{
+describe('deleting blog post', ()=>{
 
-    test('if title missing in req data, res.status==400', async () => {
-
-        const noTitleBlogPost = {
-            author: "anonymous",
-            url: "http://"
-        }
-
-        await api.post('/api/blogs')
-            .send(noTitleBlogPost)
-            .expect(400)
-    })
-
-    test('if url missing in req data, res.status==400', async () => {
-
-        const noUrlBlogPost = {
-            title: "missing likes test",
-            author: "anonymous",
-        }
-
-        await api.post('/api/blogs')
-            .send(noUrlBlogPost)
-            .expect(400)
+    test('a blog post can be deleted', async ()=>{
+        const postsInDb = await helper.postsInDb()
+        const blogPostToDelete = postsInDb[0]
+        await api
+            .delete(`/api/blogs/${blogPostToDelete.id}`)
+            .expect(204)
 
     })
 })
+
 
 afterAll(() => {
     mongoose.connection.close().catch(e => console.log(e))
