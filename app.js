@@ -26,11 +26,11 @@ mongoose.connect(config.DB_URL, {
 
 app.use(cors())
 app.use(express.json())
+app.use(middleware.getTokenFromRequest)
 app.use(middleware.requestLogger)
-app.use(middleware.errorHandler)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 
-
+app.use(middleware.errorHandler) // error handler will be the last middleware for some reason
 export default app

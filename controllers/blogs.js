@@ -6,15 +6,7 @@ import Blog from "../models/blog.js";
 import User from "../models/user.js";
 
 
-const getTokenFromRequest = async (req) => {
-    const authorization = req.get('authorization') // http header value named 'authorization' e.g Authorization: Bearer alrg.rei.ariu
-    console.log("authorization", authorization)
-    let token = null
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        token = authorization.substring('bearer '.length)
-    }
-    return token
-}
+
 
 blogsRouter.get('/',
     async (req, res, next) => {
@@ -43,12 +35,9 @@ blogsRouter.get('/',
 blogsRouter.post('/',
     async (req, res, next) => {
 
-        const token = await getTokenFromRequest(req)
-        console.log("token", token)
-
         let user
         try {
-            const decodedToken = jwt.verify(token, process.env.SECRET_KEY)  // obj the token was based on - payload {username, id}
+            const decodedToken = jwt.verify(req.token, process.env.SECRET_KEY)  // obj the token was based on - payload {username, id}
 
             console.log("decodedToken", decodedToken)
 

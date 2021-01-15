@@ -28,4 +28,15 @@ const errorHandler = (error, request, response, next) => {
     next(error)  // in all other situations passes the error to default express error handler
 }
 
-export default {requestLogger, errorHandler}
+const getTokenFromRequest = (req, res, next) => {
+    const authorization = req.get('authorization') // http header value named 'authorization' e.g Authorization: Bearer alrg.rei.ariu
+    console.log("authorization", authorization)
+    let token = null
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        token = authorization.substring('bearer '.length)
+    }
+    req.token = token
+    next()
+}
+
+export default {requestLogger, errorHandler, getTokenFromRequest}
