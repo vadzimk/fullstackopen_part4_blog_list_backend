@@ -2,11 +2,13 @@ import express from "express";
 
 const blogsRouter = express.Router()
 import Blog from "../models/blog.js";
+import User from "../models/user.js";
 
 blogsRouter.get('/',
     async (request, response, next) => {
         try {
             const blogs = await Blog.find({})
+                .populate('user', {username: 1, name: 1, id: 1})
             response.json(blogs)
         } catch (e) {
             next(e)
@@ -28,27 +30,39 @@ blogsRouter.get('/',
 
 blogsRouter.post('/',
     async (request, response, next) => {
+
+        if (request.body.title === undefined) {
+            response.status(400).json({error: "title must be specified"})
+            return
+        }
+
+        if (request.body.url === undefined) {
+            response.status(400).json({error: "url must be specified"})
+            return
+        }
+
+        let user
+
+            const users = await User.find({})
+            user = users[0]
+
+
+
+
+        const newBlog = {
+            title: request.body.title,
+            author: request.body.author,
+            url: request.body.url,
+            likes: request.body.likes || 0,
+            user: user._id
+        }
+
+        const blog = new Blog(newBlog)
         try {
-
-            if (request.body.title === undefined) {
-                response.status(400).json({error: "title must be specified"})
-                return
-            }
-
-            if (request.body.url === undefined) {
-                response.status(400).json({error: "url must be specified"})
-                return
-            }
-
-            const newBlog = {
-                title: request.body.title,
-                author: request.body.author,
-                likes: request.body.likes || 0
-            }
-
-            const blog = new Blog(newBlog)
-            const result = await blog.save()
-            response.status(201).json(result)
+            const savedBlog = await blog.save()
+            user.blogs = user.blogs.concat(savedBlog)
+            await user.save()
+            response.status(201).json(savedBlog)
         } catch (e) {
             next(e)
         }
@@ -83,7 +97,7 @@ blogsRouter.put('/:id',
             const result = await Blog.findByIdAndUpdate(req.params.id, blogPost, {new: true})
             console.log(result)
             res.json(result)
-        } catch (e){
+        } catch (e) {
             next(e)
         }
     })
