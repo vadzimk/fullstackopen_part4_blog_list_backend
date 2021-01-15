@@ -117,6 +117,19 @@ describe('adding new blog posts', () => {
                 .expect(400)
 
         })
+
+        test('if token not provided, res.status==401', async ()=>{
+            const invalidTokenPost = {
+                title: "test title",
+                author: "anonymous",
+                url: "http://",
+                likes: 1
+            }
+
+            await api.post('/api/blogs')
+                .send(invalidTokenPost)
+                .expect(401)
+        })
     })
 
 })
