@@ -4,7 +4,7 @@ const app = express()
 import cors from 'cors'
 import mongoose from "mongoose";
 import blogsRouter from "./controllers/blogs.js";
-import userRouter from "./models/user.js";
+import userRouter from "./controllers/users.js";
 import config from "./utils/config.js";
 import middleware from "./utils/middleware.js";
 

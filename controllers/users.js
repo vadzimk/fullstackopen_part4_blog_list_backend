@@ -1,25 +1,43 @@
-import mongoose from "mongoose";
-import uniqueValidator from 'mongoose-unique-validator'
+import express from "express";
+import User from "../models/user.js";
+import bcrypt from 'bcrypt'
 
-const userSchema = new mongoose.Schema({
-    username: {type: String, unique: true},
-    name: String,
-    passwordHash: String
-})
+const userRouter = express.Router()
 
-userSchema.plugin(uniqueValidator)
+userRouter.post('/',
+    async (req, res, next)=>{
+        const body = req.body
+        if(!body.password || body.password.length<3){
+            return res.status(400).json({error: "password must be at least 3 characters long"})
+        }
 
-userSchema.set('toJSON',
-    {
-        transform: (doc, retObj) => {
-            retObj.id = retObj._id
-            delete retObj._id
-            delete retObj.__v
-            delete retObj.passwordHash
+        const passwordHash = await bcrypt.hash(body.password, 10)
+        const newUser = new User({
+            username: body.username,
+            name: body.name,
+            passwordHash,
+        })
+
+        try {
+            const savedUser = await newUser.save()
+            res.json(savedUser)
+        }catch (e){
+            res.status(400).json({error: e.message})
+            console.log(e)
+            return next(e)
         }
     })
 
-const User = mongoose.model('User', userSchema)
+
+userRouter.get('/',
+    async (req, res, next) => {
+        try {
+            const users = await User.find({})
+            res.json(users)
+        } catch (e) {
+            return next(e)
+        }
+    })
 
 
-export default User
+export default userRouter

@@ -1,39 +1,25 @@
-import express from "express";
-import User from "../controllers/users.js";
-import bcrypt from 'bcrypt'
+import mongoose from "mongoose";
+import uniqueValidator from 'mongoose-unique-validator'
 
-const userRouter = express.Router()
+const userSchema = new mongoose.Schema({
+    username: {type: String, unique: true, required: true, minlength: 3},
+    name: String,
+    passwordHash: String
+})
 
-userRouter.post('/',
-    async (req, res, next)=>{
-        const body = req.body
-        const passwordHash = await bcrypt.hash(body.password, 10)
-        const newUser = new User({
-            username: body.username,
-            name: body.name,
-            passwordHash,
-        })
+userSchema.plugin(uniqueValidator)
 
-        try {
-            const savedUser = await newUser.save()
-            res.json(savedUser)
-        }catch (e){
-            res.status(500).end()
-            console.log(e)
-            return next(e)
+userSchema.set('toJSON',
+    {
+        transform: (doc, retObj) => {
+            retObj.id = retObj._id
+            delete retObj._id
+            delete retObj.__v
+            delete retObj.passwordHash
         }
     })
 
-
-userRouter.get('/',
-    async (req, res, next) => {
-        try {
-            const users = await User.find({})
-            res.json(users)
-        } catch (e) {
-            return next(e)
-        }
-    })
+const User = mongoose.model('User', userSchema)
 
 
-export default userRouter
+export default User
