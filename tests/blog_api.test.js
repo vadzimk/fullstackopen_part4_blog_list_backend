@@ -125,10 +125,19 @@ describe('adding new blog posts', () => {
 describe('deleting blog post', () => {
 
     test('a blog post can be deleted', async () => {
-        const postsInDb = await helper.postsInDb()
-        const blogPostToDelete = postsInDb[0]
+        const newBlogPost = {
+            title: "test title",
+            author: "anonymous",
+            url: "http://",
+            likes: 1
+        }
+        const createdBlog = await api.post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
+            .send(newBlogPost)
+
+
         await api
-            .delete(`/api/blogs/${blogPostToDelete.id}`)
+            .delete(`/api/blogs/${createdBlog.body.id}`)
             .set('Authorization', `Bearer ${token}`)
             .expect(204)
 

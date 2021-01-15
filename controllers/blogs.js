@@ -6,8 +6,6 @@ import Blog from "../models/blog.js";
 import User from "../models/user.js";
 
 
-
-
 blogsRouter.get('/',
     async (req, res, next) => {
         try {
@@ -42,12 +40,11 @@ blogsRouter.post('/',
             console.log("decodedToken", decodedToken)
 
             user = await User.findById(decodedToken.id)
-            if (user === null){
+            if (user === null) {
                 return res.status(400).json({error: `user not found, id ${decodedToken.id}`})
             }
 
         } catch (e) {
-            res.status(401).json({error: 'token missing or invalid'})  // unauthorized
             return next(e)
         }
 
@@ -82,14 +79,25 @@ blogsRouter.post('/',
 
 blogsRouter.delete('/:id',
     async (req, res, next) => {
+
         try {
-            const id = req.params.id
-            const result = await Blog.findByIdAndRemove(id)
-            if (!result) {  // if id is not found, result is null
-                res.status(404).end()
-            } else {
-                res.status(204).end()  // no content (resource has been deleted per request)
+            const user = await jwt.verify(req.token, process.env.SECRET_KEY)
+            console.log(user)
+
+            const blog_id = req.params.id
+
+            const blog = await Blog.findById(blog_id)
+            if (!blog){ // if id is not found, result is null
+                return res.status(404).end()
             }
+            if(user.id.toString() !== blog.user.toString()){
+                return res.status(401).json({error: "unauthorized deletion"})
+            }
+
+            const result = await Blog.findByIdAndRemove(blog_id)
+
+            res.status(204).end()  // no content (resource has been deleted per request)
+
         } catch (e) {
             next(e)
         }
