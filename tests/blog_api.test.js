@@ -16,7 +16,16 @@ beforeEach(async () => {
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)  // transforms promiseArray into a single promise
     // await will wait for fulfillment of the promise = db initialized
+
+
 })
+
+let token
+beforeAll(async ()=>{
+    await helper.createInitialUser()
+    token = await helper.loginInitialUser(api)
+})
+
 
 describe('blog api', () => {
 
@@ -39,6 +48,7 @@ describe('blog api', () => {
 })
 
 describe('adding new blog posts', () => {
+
     test('a new blog post can be added', async () => {
         const newBlogPost = {
             title: "test title",
@@ -47,6 +57,7 @@ describe('adding new blog posts', () => {
             likes: 1
         }
         await api.post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlogPost)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -65,6 +76,7 @@ describe('adding new blog posts', () => {
         }
 
         const response = await api.post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlogPost)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -87,6 +99,7 @@ describe('adding new blog posts', () => {
             }
 
             await api.post('/api/blogs')
+                .set('Authorization', `Bearer ${token}`)
                 .send(noTitleBlogPost)
                 .expect(400)
         })
@@ -99,6 +112,7 @@ describe('adding new blog posts', () => {
             }
 
             await api.post('/api/blogs')
+                .set('Authorization', `Bearer ${token}`)
                 .send(noUrlBlogPost)
                 .expect(400)
 
@@ -115,6 +129,7 @@ describe('deleting blog post', () => {
         const blogPostToDelete = postsInDb[0]
         await api
             .delete(`/api/blogs/${blogPostToDelete.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(204)
 
     })
@@ -129,6 +144,7 @@ describe('updating blog post', () => {
         console.log("blogPostToUpadte", blogPostToUpadte)
 
         const result = await api.put(`/api/blogs/${blogPostToUpadte.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({
                 ...blogPostToUpadte,
                 likes: blogPostToUpadte.likes + 1000

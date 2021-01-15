@@ -11,7 +11,7 @@ loginRouter.post('/',
         const correct = user === null ? false : bcrypt.compare(body.password, user.passwordHash)
 
         if (!(user && correct)) {
-            res.status(401)  // unauthorized
+            return res.status(401)  // unauthorized
                 .json({error: 'invalid username or password'})
         }
 

@@ -1,15 +1,27 @@
 import express from "express";
+import jwt from 'jsonwebtoken'
 
 const blogsRouter = express.Router()
 import Blog from "../models/blog.js";
 import User from "../models/user.js";
 
+
+const getTokenFromRequest = async (req) => {
+    const authorization = req.get('authorization') // http header value named 'authorization' e.g Authorization: Bearer alrg.rei.ariu
+    console.log("authorization", authorization)
+    let token = null
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        token = authorization.substring('bearer '.length)
+    }
+    return token
+}
+
 blogsRouter.get('/',
-    async (request, response, next) => {
+    async (req, res, next) => {
         try {
             const blogs = await Blog.find({})
                 .populate('user', {username: 1, name: 1, id: 1})
-            response.json(blogs)
+            res.json(blogs)
         } catch (e) {
             next(e)
         }
@@ -29,31 +41,42 @@ blogsRouter.get('/',
 //     })
 
 blogsRouter.post('/',
-    async (request, response, next) => {
+    async (req, res, next) => {
 
-        if (request.body.title === undefined) {
-            response.status(400).json({error: "title must be specified"})
-            return
-        }
-
-        if (request.body.url === undefined) {
-            response.status(400).json({error: "url must be specified"})
-            return
-        }
+        const token = await getTokenFromRequest(req)
+        console.log("token", token)
 
         let user
+        try {
+            const decodedToken = jwt.verify(token, process.env.SECRET_KEY)  // obj the token was based on - payload {username, id}
 
-            const users = await User.find({})
-            user = users[0]
+            console.log("decodedToken", decodedToken)
 
+            user = await User.findById(decodedToken.id)
+            if (user === null){
+                return res.status(400).json({error: `user not found, id ${decodedToken.id}`})
+            }
 
+        } catch (e) {
+            res.status(401).json({error: 'token missing or invalid'})  // unauthorized
+            return next(e)
+        }
 
+        if (req.body.title === undefined) {
+            res.status(400).json({error: "title must be specified"})
+            return
+        }
+
+        if (req.body.url === undefined) {
+            res.status(400).json({error: "url must be specified"})
+            return
+        }
 
         const newBlog = {
-            title: request.body.title,
-            author: request.body.author,
-            url: request.body.url,
-            likes: request.body.likes || 0,
+            title: req.body.title,
+            author: req.body.author,
+            url: req.body.url,
+            likes: req.body.likes || 0,
             user: user._id
         }
 
@@ -62,7 +85,7 @@ blogsRouter.post('/',
             const savedBlog = await blog.save()
             user.blogs = user.blogs.concat(savedBlog)
             await user.save()
-            response.status(201).json(savedBlog)
+            res.status(201).json(savedBlog)
         } catch (e) {
             next(e)
         }
