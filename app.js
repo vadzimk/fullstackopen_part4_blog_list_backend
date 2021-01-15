@@ -5,8 +5,10 @@ import cors from 'cors'
 import mongoose from "mongoose";
 import blogsRouter from "./controllers/blogs.js";
 import userRouter from "./controllers/users.js";
+import loginRouter from "./controllers/login.js";
 import config from "./utils/config.js";
 import middleware from "./utils/middleware.js";
+
 
 
 mongoose.connect(config.DB_URL, {
@@ -28,7 +30,7 @@ app.use(middleware.requestLogger)
 app.use(middleware.errorHandler)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
-
+app.use('/api/login', loginRouter)
 
 
 export default app

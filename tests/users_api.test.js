@@ -32,6 +32,7 @@ describe('users api', ()=>{
 
     })
 
+
     test('an invalid user1 is not created', async ()=>{
         const invalidUser1 = {
             username: 'hu',
@@ -71,6 +72,18 @@ describe('users api', ()=>{
         expect(response.body.error).toContain('password must be at least 3 characters long')
     })
 
+    test('a valid user can login', async ()=>{
+        const validUser = {
+            username: 'testuser',
+            password: '123456'
+        }
+
+        const response = await api.post('/api/login')
+            .send(validUser)
+            .expect(200)
+        expect(response.body.username).toEqual(validUser.username)
+        expect(response.body.token).toBeDefined()
+    })
 
     afterAll(()=>{
         mongoose.connection.close()
