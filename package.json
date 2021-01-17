@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
-    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules npx jest --verbose",
+    "test": "cross-env NODE_ENV=development NODE_OPTIONS=--experimental-vm-modules npx jest --verbose",
     "dev": "cross-env NODE_ENV=test nodemon index.js"
   },
   "keywords": [],
