@@ -31,6 +31,10 @@ app.use(middleware.requestLogger)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+if (process.env.NODE_ENV === 'test'){
+    const {testRouter} = await import('./controllers/testRoute.js')
+    app.use('/api/testing', testRouter)
+}
 
 app.use(middleware.errorHandler) // error handler will be the last middleware for some reason
 export default app

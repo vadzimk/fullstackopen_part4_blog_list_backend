@@ -90,6 +90,7 @@ blogsRouter.delete('/:id',
             if (!blog){ // if id is not found, result is null
                 return res.status(404).end()
             }
+
             if(user.id.toString() !== blog.user.toString()){
                 return res.status(401).json({error: "unauthorized deletion"})
             }

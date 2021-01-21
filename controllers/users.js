@@ -7,6 +7,7 @@ const userRouter = express.Router()
 userRouter.post('/',
     async (req, res, next) => {
         const body = req.body
+
         if (!body.password || body.password.length < 3) {
             return res.status(400).json({error: "password must be at least 3 characters long"})
         }
@@ -23,7 +24,6 @@ userRouter.post('/',
             res.json(savedUser)
         } catch (e) {
             res.status(400).json({error: e.message})
-            console.log(e)
             return next(e)
         }
     })
